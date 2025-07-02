@@ -75,8 +75,8 @@
     canvas {
       display: block;
       margin: 10px auto;
-      width: 480px;  /* keep display size reasonable */
-      height: 300px;
+      width: 320px;
+      height: 200px;
       border-radius: 15px;
       background: #1e1e22;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
@@ -145,7 +145,7 @@
     <input id="trackingRange" type="range" min="0" max="100" value="10" />
   </div>
 
-  <canvas id="canvas" width="708" height="443"></canvas>
+  <canvas id="canvas" width="472" height="295"></canvas>
 </section>
 
 <section>
@@ -218,6 +218,7 @@
   }
 
   function update() {
+    // Use hidden slider values as well
     fontSize = parseInt(fontSizeRange.value);
     leading = parseInt(leadingRange.value);
     tracking = parseInt(trackingRange.value);
@@ -243,12 +244,14 @@
     if (!singleLetter.test(val3)) {
       val3 = val3.replace(/[^A-Z]/g, '');
     }
+    // Limit to 1 character
     val3 = val3.slice(0, 1);
     line2Right.value = val3;
 
     drawPreview();
   }
 
+  // Add listeners to update preview and sanitize input
   [line1Input, line2Left, line2Right].forEach(input => {
     input.addEventListener('input', update);
   });
@@ -261,6 +264,7 @@
     a.click();
   });
 
+  // Initial call on load
   window.onload = update;
 </script>
 
