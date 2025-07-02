@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Customisable Singapore Car Plate Keychain</title>
+  <style>
+    @font-face {
+      font-family: 'CharlesWrightBold';
+      src: url('CharlesWright-Bold.otf') format('opentype');
+      font-weight: bold;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #121214;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    header, section {
+      width: 100%;
+      max-width: 420px;
+      background: #1e1e22;
+      border-radius: 15px;
+      padding: 20px 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin: 0;
+    }
+
+    input[type="text"] {
+      font-family: 'CharlesWrightBold', sans-serif;
+      font-size: 24px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: none;
+      background: #2c2c2e;
+      color: #f2f2f7;
+      text-align: center;
+      width: 100%;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .row input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    /* Hide sliders container */
+    #sliders {
+      display: none;
+    }
+
+    canvas {
+      display: block;
+      margin: 10px auto;
+      width: 320px;
+      height: 200px;
+      border-radius: 15px;
+      background: #1e1e22;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    button, .link-button {
+      width: 100%;
+      padding: 14px 0;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button {
+      background: #0a84ff;
+      color: white;
+      box-shadow: 0 10px 20px rgba(10,132,255,0.4);
+    }
+
+    .link-button {
+      background: #30d158;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 10px 20px rgba(48,209,88,0.4);
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Customisable Singapore Car Plate Keychain</h1>
+</header>
+
+<section>
+  <p><strong>Instructions:</strong></p>
+  <p>Step 1: Put your carplate number in 2 lines</p>
+  <p>Step 2: Export as PNG</p>
+  <p>Step 3: Convert PNG to SVG and make sure the filename is <code>default.svg</code></p>
+</section>
+
+<section>
+  <h2 style="margin-top:0;">Step 1</h2>
+
+  <input id="line1" type="text" placeholder="Line 1 (letters only)" value="SBA" />
+
+  <div class="row">
+    <input id="line2left" type="text" placeholder="Numbers only" value="1234" />
+    <input id="line2right" type="text" placeholder="Single letter" maxlength="1" value="A" />
+  </div>
+
+  <!-- Hidden sliders with default values -->
+  <div id="sliders" aria-hidden="true">
+    <label for="fontSizeRange">Font Size</label>
+    <input id="fontSizeRange" type="range" min="10" max="300" value="133" />
+
+    <label for="leadingRange">Leading (Line Spacing)</label>
+    <input id="leadingRange" type="range" min="10" max="200" value="125" />
+
+    <label for="trackingRange">Tracking between 1234 and A</label>
+    <input id="trackingRange" type="range" min="0" max="100" value="10" />
+  </div>
+
+  <canvas id="canvas" width="472" height="295"></canvas>
+</section>
+
+<section>
+  <h2 style="margin-top:0;">Step 2</h2>
+  <button id="exportBtn">Export as PNG</button>
+</section>
+
+<section>
+  <h2 style="margin-top:0;">Step 3</h2>
+  <a href="https://convertio.co/png-svg/" target="_blank" class="link-button">Go to PNG to SVG Converter</a>
+</section>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const line1Input = document.getElementById('line1');
+  const line2Left = document.getElementById('line2left');
+  const line2Right = document.getElementById('line2right');
+
+  const fontSizeRange = document.getElementById('fontSizeRange');
+  const leadingRange = document.getElementById('leadingRange');
+  const trackingRange = document.getElementById('trackingRange');
+
+  const exportBtn = document.getElementById('exportBtn');
+
+  // Set initial values
+  let fontSize = 133;
+  let leading = 125;
+  let tracking = 10;
+
+  // Validation regex
+  const lettersOnly = /^[A-Z\s]*$/;
+  const numbersOnly = /^[0-9]*$/;
+  const singleLetter = /^[A-Z]?$/;
+
+  function drawPreview(ctxRef = ctx, color = 'white', background = '#1e1e22') {
+    ctxRef.clearRect(0, 0, canvas.width, canvas.height);
+    ctxRef.fillStyle = background;
+    ctxRef.fillRect(0, 0, canvas.width, canvas.height);
+    ctxRef.fillStyle = color;
+    ctxRef.textBaseline = 'middle';
+    ctxRef.textAlign = 'center';
+    ctxRef.font = `bold ${fontSize}px CharlesWrightBold`;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    const line1Text = line1Input.value;
+    const leftText = line2Left.value;
+    const rightText = line2Right.value;
+
+    const leftWidth = ctxRef.measureText(leftText).width;
+    const rightWidth = ctxRef.measureText(rightText).width;
+    const totalWidth = leftWidth + tracking + rightWidth;
+    const xStart = centerX - totalWidth / 2;
+
+    ctxRef.fillText(line1Text, centerX, centerY - leading / 2);
+    ctxRef.fillText(leftText, xStart + leftWidth / 2, centerY + leading / 2);
+    ctxRef.fillText(rightText, xStart + leftWidth + tracking + rightWidth / 2, centerY + leading / 2);
+  }
+
+  function drawExportCanvas() {
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = canvas.width;
+    exportCanvas.height = canvas.height;
+    const exportCtx = exportCanvas.getContext('2d');
+    drawPreview(exportCtx, 'black', 'transparent');
+    return exportCanvas;
+  }
+
+  function update() {
+    // Use hidden slider values as well
+    fontSize = parseInt(fontSizeRange.value);
+    leading = parseInt(leadingRange.value);
+    tracking = parseInt(trackingRange.value);
+
+    // Uppercase enforcement + validation:
+
+    // Line 1: letters and spaces only
+    let val1 = line1Input.value.toUpperCase();
+    if (!lettersOnly.test(val1)) {
+      val1 = val1.replace(/[^A-Z\s]/g, '');
+    }
+    line1Input.value = val1;
+
+    // Line 2 left: numbers only
+    let val2 = line2Left.value;
+    if (!numbersOnly.test(val2)) {
+      val2 = val2.replace(/[^0-9]/g, '');
+    }
+    line2Left.value = val2;
+
+    // Line 2 right: single letter max, letters only
+    let val3 = line2Right.value.toUpperCase();
+    if (!singleLetter.test(val3)) {
+      val3 = val3.replace(/[^A-Z]/g, '');
+    }
+    // Limit to 1 character
+    val3 = val3.slice(0, 1);
+    line2Right.value = val3;
+
+    drawPreview();
+  }
+
+  // Add listeners to update preview and sanitize input
+  [line1Input, line2Left, line2Right].forEach(input => {
+    input.addEventListener('input', update);
+  });
+
+  exportBtn.addEventListener('click', () => {
+    const exportCanvas = drawExportCanvas();
+    const a = document.createElement('a');
+    a.href = exportCanvas.toDataURL('image/png');
+    a.download = 'default.png';
+    a.click();
+  });
+
+  // Initial call on load
+  window.onload = update;
+</script>
+
+</body>
+</html>
