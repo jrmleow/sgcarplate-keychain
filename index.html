@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Customisable Car & Motorcycle Plate Keychain</title>
+  <style>
+    @font-face {
+      font-family: 'CharlesWrightBold';
+      src: url('CharlesWright-Bold.otf') format('opentype');
+      font-weight: bold;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #121214;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    header, section {
+      width: 100%;
+      max-width: 900px;
+      background: #1e1e22;
+      border-radius: 15px;
+      padding: 20px 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin: 0;
+    }
+
+    label, select {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    input[type="text"] {
+      font-family: 'CharlesWrightBold', sans-serif;
+      font-size: 24px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: none;
+      background: #2c2c2e;
+      color: #f2f2f7;
+      text-align: center;
+      width: 100%;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .row input { flex: 1; margin-bottom: 0; }
+
+    #sliders { display: none; }
+
+    canvas {
+      display: block;
+      margin: 10px auto;
+      border-radius: 15px;
+      background: #1e1e22;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    button, .link-button {
+      width: 100%;
+      padding: 14px 0;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button {
+      background: #0a84ff;
+      color: white;
+      box-shadow: 0 10px 20px rgba(10,132,255,0.4);
+    }
+
+    .link-button {
+      background: #30d158;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 10px 20px rgba(48,209,88,0.4);
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Customisable Car & Motorcycle Plate Keychain</h1>
+</header>
+
+<section>
+  <label for="plateType">Please choose the type of plate:</label>
+  <select id="plateType">
+    <option value="">-- Select --</option>
+    <option value="car">2 Lines</option>
+    <option value="motorcycle">1 Line</option>
+  </select>
+</section>
+
+<!-- CAR SECTION -->
+<section id="carSections" style="display: none;">
+  <p><strong>Instructions:</strong></p>
+  <p>Step 1: Put your Vehicle Plate number in 2 lines</p>
+  <p>Step 2: Export as PNG</p>
+  <p>Step 3: Convert PNG to SVG and make sure the filename is <code>default.svg</code></p>
+
+  <h2>Step 1</h2>
+  <input id="line1" type="text" placeholder="Line 1 (letters only)" value="SBA" />
+  <div class="row">
+    <input id="line2left" type="text" placeholder="Numbers only" value="1234" />
+    <input id="line2right" type="text" placeholder="Single letter" maxlength="1" value="A" />
+  </div>
+
+  <canvas id="canvasCar" width="472" height="295"></canvas>
+
+  <h2>Step 2</h2>
+  <button id="exportBtnCar">Export as PNG</button>
+
+  <h2>Step 3</h2>
+  <a href="https://www.freeconvert.com/png-to-svg" target="_blank" class="link-button">Go to PNG to SVG Converter</a>
+</section>
+
+<!-- MOTORCYCLE SECTION -->
+<section id="motorcycleSections" style="display: none;">
+  <p><strong>Instructions:</strong></p>
+  <p>Step 1: Put your Vehicle Plate Number number in 1 line</p>
+  <p>Step 2: Export as PNG</p>
+  <p>Step 3: Convert PNG to SVG and make sure the filename is <code>default.svg</code></p>
+
+  <h2>Step 1</h2>
+  <div class="row">
+    <input id="motorcycleField1" type="text" value="FBA" />
+    <input id="motorcycleField2" type="text" value="1234" />
+    <input id="motorcycleField3" type="text" value="Z" />
+  </div>
+
+  <!-- Hidden sliders -->
+  <div id="sliders" style="display:none;">
+    <div class="slider-group">
+      <label for="tracking12">Tracking between Field 1 & 2: <span id="tracking12Val">8</span> px</label>
+      <input type="range" id="tracking12" min="0" max="30" value="8" />
+    </div>
+    <div class="slider-group">
+      <label for="tracking23">Tracking between Field 2 & 3: <span id="tracking23Val">8</span> px</label>
+      <input type="range" id="tracking23" min="0" max="30" value="8" />
+    </div>
+  </div>
+
+  <canvas id="canvasMotorcycle" width="720" height="100"></canvas>
+
+  <h2>Step 2</h2>
+  <button id="exportBtnMotorcycle">Export as PNG</button>
+
+  <h2>Step 3</h2>
+  <a href="https://www.freeconvert.com/png-to-svg" target="_blank" class="link-button">Go to PNG to SVG Converter</a>
+</section>
+
+<script>
+  // Plate type selection toggle
+  const plateTypeSelect = document.getElementById('plateType');
+  const carSections = document.getElementById('carSections');
+  const motorcycleSections = document.getElementById('motorcycleSections');
+
+  plateTypeSelect.addEventListener('change', () => {
+    const type = plateTypeSelect.value;
+    carSections.style.display = (type === 'car') ? 'block' : 'none';
+    motorcycleSections.style.display = (type === 'motorcycle') ? 'block' : 'none';
+    if (type === 'car') drawCarPreview();
+    if (type === 'motorcycle') drawMotorcyclePreview();
+  });
+
+  // =========== CAR LOGIC ===========
+  const canvasCar = document.getElementById('canvasCar');
+  const ctxCar = canvasCar.getContext('2d');
+  const line1Input = document.getElementById('line1');
+  const line2Left = document.getElementById('line2left');
+  const line2Right = document.getElementById('line2right');
+  const exportBtnCar = document.getElementById('exportBtnCar');
+
+  function drawCarPreview() {
+    let fontSize = 133;
+    let leading = 125;
+    let tracking = 10;
+    const maxWidth = canvasCar.width * 0.9;
+
+    const ctx = ctxCar;
+    ctx.clearRect(0, 0, canvasCar.width, canvasCar.height);
+    ctx.fillStyle = '#1e1e22';
+    ctx.fillRect(0, 0, canvasCar.width, canvasCar.height);
+    ctx.fillStyle = 'white';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+
+    const line1Text = line1Input.value.toUpperCase();
+    const leftText = line2Left.value;
+    const rightText = line2Right.value.toUpperCase();
+
+    // Auto-scale logic
+    ctx.font = `bold ${fontSize}px CharlesWrightBold`;
+    let leftWidth = ctx.measureText(leftText).width;
+    let rightWidth = ctx.measureText(rightText).width;
+    let line1Width = ctx.measureText(line1Text).width;
+
+    while (Math.max(leftWidth + tracking + rightWidth, line1Width) > maxWidth && fontSize > 60) {
+      fontSize -= 2;
+      leading = fontSize * 0.95;
+      tracking = fontSize * 0.08;
+      ctx.font = `bold ${fontSize}px CharlesWrightBold`;
+      leftWidth = ctx.measureText(leftText).width;
+      rightWidth = ctx.measureText(rightText).width;
+      line1Width = ctx.measureText(line1Text).width;
+    }
+
+    const centerX = canvasCar.width / 2;
+    const centerY = canvasCar.height / 2;
+    const totalWidth = leftWidth + tracking + rightWidth;
+    const xStart = centerX - totalWidth / 2;
+
+    ctx.fillText(line1Text, centerX, centerY - leading / 2);
+    ctx.fillText(leftText, xStart + leftWidth / 2, centerY + leading / 2);
+    ctx.fillText(rightText, xStart + leftWidth + tracking + rightWidth / 2, centerY + leading / 2);
+  }
+
+  [line1Input, line2Left, line2Right].forEach(input => {
+    input.addEventListener('input', drawCarPreview);
+  });
+
+  exportBtnCar.addEventListener('click', () => {
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = canvasCar.width;
+    exportCanvas.height = canvasCar.height;
+    const exportCtx = exportCanvas.getContext('2d');
+    exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+    // Transparent background
+    // Note: fillStyle='transparent' doesn't do anything, so skip fillRect here
+    // exportCtx.fillStyle = 'transparent';
+    // exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+    // Black text for export
+    exportCtx.fillStyle = 'black';
+    exportCtx.textBaseline = 'middle';
+    exportCtx.textAlign = 'center';
+
+    let fontSize = 133;
+    let leading = 125;
+    let tracking = 10;
+    const maxWidth = exportCanvas.width * 0.9;
+
+    const line1Text = line1Input.value.toUpperCase();
+    const leftText = line2Left.value;
+    const rightText = line2Right.value.toUpperCase();
+
+    // Auto-scale font size for export canvas as well
+    exportCtx.font = `bold ${fontSize}px CharlesWrightBold`;
+    let leftWidth = exportCtx.measureText(leftText).width;
+    let rightWidth = exportCtx.measureText(rightText).width;
+    let line1Width = exportCtx.measureText(line1Text).width;
+
+    while (Math.max(leftWidth + tracking + rightWidth, line1Width) > maxWidth && fontSize > 60) {
+      fontSize -= 2;
+      leading = fontSize * 0.95;
+      tracking = fontSize * 0.08;
+      exportCtx.font = `bold ${fontSize}px CharlesWrightBold`;
+      leftWidth = exportCtx.measureText(leftText).width;
+      rightWidth = exportCtx.measureText(rightText).width;
+      line1Width = exportCtx.measureText(line1Text).width;
+    }
+
+    const centerX = exportCanvas.width / 2;
+    const centerY = exportCanvas.height / 2;
+    const totalWidth = leftWidth + tracking + rightWidth;
+    const xStart = centerX - totalWidth / 2;
+
+    exportCtx.fillText(line1Text, centerX, centerY - leading / 2);
+    exportCtx.fillText(leftText, xStart + leftWidth / 2, centerY + leading / 2);
+    exportCtx.fillText(rightText, xStart + leftWidth + tracking + rightWidth / 2, centerY + leading / 2);
+
+    // Export PNG
+    const a = document.createElement('a');
+    a.href = exportCanvas.toDataURL('image/png');
+    a.download = 'default.png';
+    a.click();
+  });
+
+  // =========== MOTORCYCLE LOGIC ===========
+  const canvasMotorcycle = document.getElementById('canvasMotorcycle');
+  const ctxMotorcycle = canvasMotorcycle.getContext('2d');
+
+  const motorcycleField1 = document.getElementById('motorcycleField1');
+  const motorcycleField2 = document.getElementById('motorcycleField2');
+  const motorcycleField3 = document.getElementById('motorcycleField3');
+
+  const tracking12 = document.getElementById('tracking12');
+  const tracking23 = document.getElementById('tracking23');
+
+  const tracking12Val = document.getElementById('tracking12Val');
+  const tracking23Val = document.getElementById('tracking23Val');
+
+  // Set default slider values display
+  tracking12Val.textContent = tracking12.value;
+  tracking23Val.textContent = tracking23.value;
+
+  tracking12.addEventListener('input', () => {
+    tracking12Val.textContent = tracking12.value;
+    drawMotorcyclePreview();
+  });
+
+  tracking23.addEventListener('input', () => {
+    tracking23Val.textContent = tracking23.value;
+    drawMotorcyclePreview();
+  });
+
+  function drawMotorcyclePreview() {
+    const fontSize = 72;
+    ctxMotorcycle.clearRect(0, 0, canvasMotorcycle.width, canvasMotorcycle.height);
+    ctxMotorcycle.fillStyle = '#1e1e22';
+    ctxMotorcycle.fillRect(0, 0, canvasMotorcycle.width, canvasMotorcycle.height);
+
+    ctxMotorcycle.fillStyle = 'white';
+    ctxMotorcycle.textBaseline = 'middle';
+    ctxMotorcycle.textAlign = 'left';
+    ctxMotorcycle.font = `bold ${fontSize}px CharlesWrightBold`;
+
+    const text1 = motorcycleField1.value.toUpperCase();
+    const text2 = motorcycleField2.value;
+    const text3 = motorcycleField3.value.toUpperCase();
+
+    const width1 = ctxMotorcycle.measureText(text1).width;
+    const width2 = ctxMotorcycle.measureText(text2).width;
+    const width3 = ctxMotorcycle.measureText(text3).width;
+
+    const gap12 = parseInt(tracking12.value);
+    const gap23 = parseInt(tracking23.value);
+
+    const totalWidth = width1 + gap12 + width2 + gap23 + width3;
+    const startX = (canvasMotorcycle.width - totalWidth) / 2;
+    const centerY = canvasMotorcycle.height / 2;
+
+    let x = startX;
+    ctxMotorcycle.fillText(text1, x, centerY);
+    x += width1 + gap12;
+    ctxMotorcycle.fillText(text2, x, centerY);
+    x += width2 + gap23;
+    ctxMotorcycle.fillText(text3, x, centerY);
+  }
+
+  [motorcycleField1, motorcycleField2, motorcycleField3].forEach(input => {
+    input.addEventListener('input', drawMotorcyclePreview);
+  });
+
+  const exportBtnMotorcycle = document.getElementById('exportBtnMotorcycle');
+  exportBtnMotorcycle.addEventListener('click', () => {
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = canvasMotorcycle.width;
+    exportCanvas.height = canvasMotorcycle.height;
+    const exportCtx = exportCanvas.getContext('2d');
+    exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+    // Transparent background
+    // exportCtx.fillStyle = 'transparent';
+    // exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+    // Black text for export
+    exportCtx.fillStyle = 'black';
+    exportCtx.textBaseline = 'middle';
+    exportCtx.textAlign = 'left';
+    exportCtx.font = `bold 72px CharlesWrightBold`;
+
+    const text1 = motorcycleField1.value.toUpperCase();
+    const text2 = motorcycleField2.value;
+    const text3 = motorcycleField3.value.toUpperCase();
+
+    const width1 = exportCtx.measureText(text1).width;
+    const width2 = exportCtx.measureText(text2).width;
+    const width3 = exportCtx.measureText(text3).width;
+
+    const gap12 = parseInt(tracking12.value);
+    const gap23 = parseInt(tracking23.value);
+
+    const totalWidth = width1 + gap12 + width2 + gap23 + width3;
+    const startX = (exportCanvas.width - totalWidth) / 2;
+    const centerY = exportCanvas.height / 2;
+
+    let x = startX;
+    exportCtx.fillText(text1, x, centerY);
+    x += width1 + gap12;
+    exportCtx.fillText(text2, x, centerY);
+    x += width2 + gap23;
+    exportCtx.fillText(text3, x, centerY);
+
+    // Export PNG
+    const a = document.createElement('a');
+    a.href = exportCanvas.toDataURL('image/png');
+    a.download = 'default.png';
+    a.click();
+  });
+
+  window.onload = () => {
+    if (plateTypeSelect.value === 'car') drawCarPreview();
+    if (plateTypeSelect.value === 'motorcycle') drawMotorcyclePreview();
+  };
+</script>
+
+</body>
+</html>
